@@ -3,6 +3,7 @@ import sys
 import json
 import argparse
 import pyperclip
+import subprocess
 
 
 class LocalStorage:
@@ -45,12 +46,12 @@ class LocalStorage:
         if domain in self._storage.keys():
             for elem in self._storage[domain]["elems"]:
 
-                if index == -1 and not elem["in_use"]:
+                if index == -1 and not elem["in_use"] and value != "":
                     elem["value"] = value
                     elem["in_use"] = True
                     break
 
-                if elem["id"] == index:
+                if elem["id"] == index and value != "":
                     elem["value"] = value
                     elem["in_use"] = True
                     break
@@ -145,6 +146,7 @@ parser.add_argument(
 parser.add_argument(
     '-v', '--value',
     type=str,
+    default="",
     help="elem value")
 
 args = parser.parse_args()
@@ -153,10 +155,24 @@ ACTIONS = {
     "clip": pyperclip.copy
 }
 
+
+def _ex_subprocess(cmd, shell=True):
+    p = subprocess.Popen(
+        cmd, shell=shell, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    output, error = p.communicate()
+    return (p.returncode, output, error)
+
+
+def get_selection():
+    returncode, output, error = _ex_subprocess("xclip -o")
+    return output
+
+
 if __name__ == "__main__":
     config = json.loads(open(args.config, "r+").read())
 
     DOMAIN = config["default_domain"] if args.domain == "" else args.domain
+    VALUE = get_selection() if args.value == "" else args.value
 
     if args.generate:
         LocalStorage.create_storage(config, config["domains"])
@@ -164,7 +180,7 @@ if __name__ == "__main__":
 
     local = LocalStorage(config)
     if args.add:
-        local.add_elem_to_domain(DOMAIN, args.index, args.value)
+        local.add_elem_to_domain(DOMAIN, args.index, VALUE)
 
     if args.remove:
         local.remove_elem_from_domain(DOMAIN, args.index)
@@ -175,6 +191,6 @@ if __name__ == "__main__":
             ACTIONS[action](elem["value"])
 
     if args.list:
-        print(CLIFormat.format_domain(local.get_domain("clip")))
+        print(CLIFormat.format_domain(local.get_domain(config["default_domain"])))
 
     local.store_changes()
