@@ -42,6 +42,12 @@ class LocalStorage:
     def get_list(self, domain):
         return self._storage[domain]["elems"]
 
+    def reset_domain(self, domain):
+        if domain in self._storage.keys():
+            for elem in self._storage[domain]["elems"]:
+                elem["value"] = ""
+                elem["in_use"] = False
+
     def add_elem_to_domain(self, domain, index, value):
         if domain in self._storage.keys():
             for elem in self._storage[domain]["elems"]:
@@ -122,6 +128,11 @@ parser.add_argument(
     help="remove elem")
 
 parser.add_argument(
+    '--reset',
+    action='store_true',
+    help="reset all elements")
+
+parser.add_argument(
     '-s', '--select',
     action='store_true',
     help="select elem")
@@ -164,7 +175,7 @@ def _ex_subprocess(cmd, shell=True):
 
 
 def get_selection():
-    returncode, output, error = _ex_subprocess("xclip -o")
+    _, output, _ = _ex_subprocess("xclip -o")
     return output
 
 
@@ -191,6 +202,10 @@ if __name__ == "__main__":
             ACTIONS[action](elem["value"])
 
     if args.list:
-        print(CLIFormat.format_domain(local.get_domain(config["default_domain"])))
+        print(CLIFormat.format_domain(
+            local.get_domain(config["default_domain"])))
+
+    if args.reset:
+        local.reset_domain(DOMAIN)
 
     local.store_changes()
