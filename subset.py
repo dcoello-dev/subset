@@ -7,19 +7,19 @@ import subprocess
 
 
 class LocalStorage:
-    def __init__(self, config):
+    def __init__(self, config: dict):
         self._config = config
         file_ = open(config["file"], "r")
         self._storage = json.loads(file_.read())
         file_.close()
 
-    def store_changes(self):
+    def store_changes(self) -> None:
         file_ = open(self._config["file"], "w+")
         file_.write(json.dumps(self._storage, indent=2))
         file_.close()
 
     @staticmethod
-    def create_storage(config, domains):
+    def create_storage(config: dict, domains: list) -> None:
         file_ = open(config["file"], "w+")
         to_store_ = {"meta":
                      {
@@ -36,19 +36,19 @@ class LocalStorage:
 
         file_.write(json.dumps(to_store_, indent=2))
 
-    def get_domain(self, domain):
+    def get_domain(self, domain: str) -> dict:
         return self._storage[domain]
 
-    def get_list(self, domain):
+    def get_list(self, domain: str) -> list:
         return self._storage[domain]["elems"]
 
-    def reset_domain(self, domain):
+    def reset_domain(self, domain: str):
         if domain in self._storage.keys():
             for elem in self._storage[domain]["elems"]:
                 elem["value"] = ""
                 elem["in_use"] = False
 
-    def add_elem_to_domain(self, domain, index, value):
+    def add_elem_to_domain(self, domain: str, index: int, value: str) -> None:
         if domain in self._storage.keys():
             for elem in self._storage[domain]["elems"]:
 
@@ -62,7 +62,7 @@ class LocalStorage:
                     elem["in_use"] = True
                     break
 
-    def remove_elem_from_domain(self, domain, index):
+    def remove_elem_from_domain(self, domain: str, index: int) -> None:
         if domain in self._storage.keys():
             for elem in self._storage[domain]["elems"]:
                 if elem["id"] == index:
@@ -70,7 +70,7 @@ class LocalStorage:
                     elem["in_use"] = False
                     break
 
-    def select_elem_from_domain(self, domain, index):
+    def select_elem_from_domain(self, domain: str, index: int) -> None:
         if domain in self._storage.keys():
             for elem in self._storage[domain]["elems"]:
                 if elem["id"] == index:
@@ -89,11 +89,11 @@ class CLIFormat:
     UNDERLINE = '\033[4m'
 
     @staticmethod
-    def colored(str, color):
+    def colored(str: str, color: str) -> str:
         return color + str + CLIFormat.ENDC
 
     @staticmethod
-    def format_domain(domain):
+    def format_domain(domain: dict) -> str:
         msg = ""
         for elem in domain["elems"]:
             if elem["in_use"]:
@@ -167,14 +167,14 @@ ACTIONS = {
 }
 
 
-def _ex_subprocess(cmd, shell=True):
+def _ex_subprocess(cmd: str, shell=True) -> tuple:
     p = subprocess.Popen(
         cmd, shell=shell, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     output, error = p.communicate()
     return (p.returncode, output, error)
 
 
-def get_selection():
+def get_selection() -> str:
     _, output, _ = _ex_subprocess("xclip -o")
     return output
 
@@ -203,7 +203,7 @@ if __name__ == "__main__":
 
     if args.list:
         print(CLIFormat.format_domain(
-            local.get_domain(config["default_domain"])))
+            local.get_domain(DOMAIN)))
 
     if args.reset:
         local.reset_domain(DOMAIN)
