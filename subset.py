@@ -1,4 +1,5 @@
 import os
+import git
 import sys
 import json
 import argparse
@@ -109,7 +110,7 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument(
     '-c', '--config',
-    default=os.path.expanduser('~') + "/.config/.subset/config",
+    default=os.path.expanduser('~') + "/.config/subset/config",
     help="configuration file")
 
 parser.add_argument(
@@ -162,8 +163,17 @@ parser.add_argument(
 
 args = parser.parse_args()
 
+
+def checkout_branch(branch: str) -> None:
+    repo_dir = os.getcwd()
+    repo = git.Repo.init(repo_dir)
+    cmd = repo.git
+    cmd.checkout(branch)
+
+
 ACTIONS = {
-    "clip": pyperclip.copy
+    "clip": pyperclip.copy,
+    "checkout": checkout_branch
 }
 
 

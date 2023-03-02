@@ -1,3 +1,5 @@
+# example of i3 bind
+
 bindsym $mod+u exec "python3 ~/.config/.subset/subset.py -a -i 1"
 bindsym $mod+Shift+u exec "python3 ~/.config/.subset/subset.py -s -i 1"
 bindsym $mod+i exec "python3 ~/.config/.subset/subset.py -a -i 2"

@@ -1,0 +1,10 @@
+# example of blesh bind
+
+ble-bind -c 'C-g l' 'python3 ~/.config/subset/subset.py -d git -l'
+ble-bind -c 'C-g u' 'python3 ~/.config/subset/subset.py -a -d git -i 0'
+ble-bind -c 'C-g i' 'python3 ~/.config/subset/subset.py -a -d git -i 1'
+ble-bind -c 'C-g o' 'python3 ~/.config/subset/subset.py -a -d git -i 2'
+ble-bind -c 'C-g U' 'python3 ~/.config/subset/subset.py -s -d git -i 0'
+ble-bind -c 'C-g I' 'python3 ~/.config/subset/subset.py -s -d git -i 1'
+ble-bind -c 'C-g O' 'python3 ~/.config/subset/subset.py -s -d git -i 2'
+ble-bind -c 'C-g R' 'python3 ~/.config/subset/subset.py -d git --reset'
