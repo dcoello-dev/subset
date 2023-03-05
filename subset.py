@@ -1,110 +1,14 @@
 import os
-import git
 import sys
 import json
 import argparse
-import pyperclip
-import subprocess
 
+import sources
+import sinks
+import storages
 
-class LocalStorage:
-    def __init__(self, config: dict):
-        self._config = config
-        file_ = open(config["file"], "r")
-        self._storage = json.loads(file_.read())
-        file_.close()
-
-    def store_changes(self) -> None:
-        file_ = open(self._config["file"], "w+")
-        file_.write(json.dumps(self._storage, indent=2))
-        file_.close()
-
-    @staticmethod
-    def create_storage(config: dict, domains: list) -> None:
-        file_ = open(config["file"], "w+")
-        to_store_ = {"meta":
-                     {
-                         "user": config["user"]
-                     }
-                     }
-
-        for domain, N, action in domains:
-            to_store_[domain] = {
-                "max_elems": N,
-                "default_action": action,
-                "elems": [{"id": i, "in_use": False, "value": ""} for i in range(0, N)]
-            }
-
-        file_.write(json.dumps(to_store_, indent=2))
-
-    def get_domain(self, domain: str) -> dict:
-        return self._storage[domain]
-
-    def get_list(self, domain: str) -> list:
-        return self._storage[domain]["elems"]
-
-    def reset_domain(self, domain: str):
-        if domain in self._storage.keys():
-            for elem in self._storage[domain]["elems"]:
-                elem["value"] = ""
-                elem["in_use"] = False
-
-    def add_elem_to_domain(self, domain: str, index: int, value: str) -> None:
-        if domain in self._storage.keys():
-            for elem in self._storage[domain]["elems"]:
-
-                if index == -1 and not elem["in_use"] and value != "":
-                    elem["value"] = value
-                    elem["in_use"] = True
-                    break
-
-                if elem["id"] == index and value != "":
-                    elem["value"] = value
-                    elem["in_use"] = True
-                    break
-
-    def remove_elem_from_domain(self, domain: str, index: int) -> None:
-        if domain in self._storage.keys():
-            for elem in self._storage[domain]["elems"]:
-                if elem["id"] == index:
-                    elem["value"] = ""
-                    elem["in_use"] = False
-                    break
-
-    def select_elem_from_domain(self, domain: str, index: int) -> None:
-        if domain in self._storage.keys():
-            for elem in self._storage[domain]["elems"]:
-                if elem["id"] == index:
-                    return self._storage[domain]["default_action"], elem
-
-
-class CLIFormat:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKCYAN = '\033[96m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
-
-    @staticmethod
-    def colored(str: str, color: str) -> str:
-        return color + str + CLIFormat.ENDC
-
-    @staticmethod
-    def format_domain(domain: dict) -> str:
-        msg = ""
-        for elem in domain["elems"]:
-            if elem["in_use"]:
-                msg += CLIFormat.colored(str(elem["id"]),
-                                         CLIFormat.OKGREEN + CLIFormat.BOLD)
-                msg += ": "
-                msg += elem["value"][:40]
-                msg += "\n"
-        return msg
-
+from core.Register import *
+from core.CLIFormat import CLIFormat
 
 parser = argparse.ArgumentParser()
 
@@ -163,43 +67,18 @@ parser.add_argument(
 
 args = parser.parse_args()
 
-
-def checkout_branch(branch: str) -> None:
-    repo_dir = os.getcwd()
-    repo = git.Repo.init(repo_dir)
-    cmd = repo.git
-    cmd.checkout(branch)
-
-
-ACTIONS = {
-    "clip": pyperclip.copy,
-    "checkout": checkout_branch
-}
-
-
-def _ex_subprocess(cmd: str, shell=True) -> tuple:
-    p = subprocess.Popen(
-        cmd, shell=shell, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    output, error = p.communicate()
-    return (p.returncode, output, error)
-
-
-def get_selection() -> str:
-    _, output, _ = _ex_subprocess("xclip -o")
-    return output
-
-
 if __name__ == "__main__":
     config = json.loads(open(args.config, "r+").read())
-
+    storage_t_ = REG_NAMESPACE[Type.STORAGE][config["storage"]]["instance"]
     DOMAIN = config["default_domain"] if args.domain == "" else args.domain
-    VALUE = get_selection() if args.value == "" else args.value
+    VALUE = REG_NAMESPACE[Type.SOURCE][config["domains"][DOMAIN]["default_source"]]["instance"].get() \
+        if args.value == "" else args.value
 
     if args.generate:
-        LocalStorage.create_storage(config, config["domains"])
+        storage_t_.create_storage(config, config["domains"])
         sys.exit(0)
 
-    local = LocalStorage(config)
+    local = storage_t_(config)
     if args.add:
         local.add_elem_to_domain(DOMAIN, args.index, VALUE)
 
@@ -209,7 +88,7 @@ if __name__ == "__main__":
     if args.select:
         action, elem = local.select_elem_from_domain(DOMAIN, args.index)
         if elem["in_use"]:
-            ACTIONS[action](elem["value"])
+            REG_NAMESPACE[Type.SINK][action]["instance"].send(elem["value"])
 
     if args.list:
         print(CLIFormat.format_domain(
