@@ -5,6 +5,7 @@ class Type:
     SINK = "sink"
     SOURCE = "source"
     STORAGE = "storage"
+    PROXY = "proxy"
 
 
 REG_NAMESPACE = defaultdict(dict)
