@@ -8,7 +8,7 @@ from storages.Storage import Storage
 class LocalStorage(Storage):
     def __init__(self, config: dict):
         super().__init__(config)
-        file_ = open(config["file"], "r")
+        file_ = open(self._config["file"], "r")
         self._storage = json.loads(file_.read())
         file_.close()
 
@@ -19,7 +19,7 @@ class LocalStorage(Storage):
 
     @staticmethod
     def create_storage(config: dict, domains: list) -> None:
-        file_ = open(config["file"], "w+")
+        file_ = open(config["storage"]["file"], "w+")
         to_store_ = {"meta":
                      {
                          "user": config["user"]
@@ -74,4 +74,4 @@ class LocalStorage(Storage):
         if domain in self._storage.keys():
             for elem in self._storage[domain]["elems"]:
                 if elem["id"] == index:
-                    return self._storage[domain]["default_action"], elem
+                    return self._storage[domain]["default_sink"], elem
