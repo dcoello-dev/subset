@@ -93,19 +93,22 @@ if __name__ == "__main__":
         storage_t_.create_storage(config, config["domains"])
         local = storage_t_(config["storage"])
         for domain in config["domains"].keys():
-            proxy.update_shared_domain(USER, domain, local.get_domain(domain))
+            if config["domains"][domain]["shared"]:
+                proxy.update_shared_domain(USER, domain, local.get_domain(domain))
 
     local = storage_t_(config["storage"])
 
     if args.add:
         local.add_elem_to_domain(DOMAIN, args.index, VALUE)
-        _, elem = local.select_elem_from_domain(DOMAIN, args.index)
-        proxy.update_shared_domain_elem(USER, DOMAIN, args.index, elem)
+        if config["domains"][DOMAIN]["shared"]:
+            _, elem = local.select_elem_from_domain(DOMAIN, args.index)
+            proxy.update_shared_domain_elem(USER, DOMAIN, args.index, elem)
 
     if args.remove:
         local.remove_elem_from_domain(DOMAIN, args.index)
-        _, elem = local.select_elem_from_domain(DOMAIN, args.index)
-        proxy.update_shared_domain_elem(USER, DOMAIN, args.index, elem)
+        if config["domains"][DOMAIN]["shared"]:
+            _, elem = local.select_elem_from_domain(DOMAIN, args.index)
+            proxy.update_shared_domain_elem(USER, DOMAIN, args.index, elem)
 
     if args.select:
         action, elem = local.select_elem_from_domain(DOMAIN, args.index)
@@ -122,7 +125,8 @@ if __name__ == "__main__":
 
     if args.reset:
         local.reset_domain(DOMAIN)
-        proxy.update_shared_domain(USER, DOMAIN, local.get_domain(DOMAIN))
+        if config["domains"][DOMAIN]["shared"]:
+            proxy.update_shared_domain(USER, DOMAIN, local.get_domain(DOMAIN))
 
     local.store_changes()
     time.sleep(0.1)
