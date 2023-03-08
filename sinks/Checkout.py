@@ -12,8 +12,8 @@ class Checkout(Sink):
         pass
 
     @staticmethod
-    def send(data: str) -> None:
+    def send(data: dict) -> None:
         repo_dir = os.getcwd()
         repo = git.Repo.init(repo_dir)
         cmd = repo.git
-        cmd.checkout(data)
+        cmd.checkout(data["str"])

@@ -11,5 +11,5 @@ class Clip(Sink):
         pass
 
     @staticmethod
-    def send(data: str) -> None:
-        pyperclip.copy(data)
+    def send(data: dict) -> None:
+        pyperclip.copy(data["str"])

@@ -48,7 +48,7 @@ class LocalStorage(Storage):
                 elem["value"] = ""
                 elem["in_use"] = False
 
-    def add_elem_to_domain(self, domain: str, index: int, value: str) -> None:
+    def add_elem_to_domain(self, domain: str, index: int, value) -> None:
         if domain in self._storage.keys():
             for elem in self._storage[domain]["elems"]:
 

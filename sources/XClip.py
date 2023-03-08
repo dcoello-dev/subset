@@ -10,6 +10,6 @@ class XClip(Source):
         pass
 
     @staticmethod
-    def get() -> str:
+    def get() -> dict:
         _, output, _ = _ex_subprocess("xclip -o")
-        return output
+        return dict(str=output)
