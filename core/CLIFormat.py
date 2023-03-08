@@ -3,6 +3,7 @@ import shlex
 import termios
 from pathlib import Path
 
+
 class CLIFormat:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -34,11 +35,12 @@ class CLIFormat:
                 msg += CLIFormat.colored(str(elem["id"]),
                                          CLIFormat.OKGREEN + CLIFormat.BOLD)
                 msg += ": "
-                if type(elem["value"]) is str:
+                if isinstance(elem["value"], str):
                     msg += elem["value"][:40]
                 else:
                     for k, v in elem["value"].items():
-                        msg += CLIFormat.colored(k, CLIFormat.WARNING + CLIFormat.BOLD) + ": "
+                        msg += CLIFormat.colored(k,
+                                                 CLIFormat.WARNING + CLIFormat.BOLD) + ": "
                         msg += CLIFormat.colored(v + " ", CLIFormat.OKBLUE)
                     msg = msg[:-2]
                 msg += "\n"

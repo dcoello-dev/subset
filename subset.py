@@ -94,7 +94,8 @@ if __name__ == "__main__":
         local = storage_t_(config["storage"])
         for domain in config["domains"].keys():
             if config["domains"][domain]["shared"]:
-                proxy.update_shared_domain(USER, domain, local.get_domain(domain))
+                proxy.update_shared_domain(
+                    USER, domain, local.get_domain(domain))
 
     local = storage_t_(config["storage"])
 
