@@ -27,12 +27,12 @@ parser.add_argument(
 parser.add_argument(
     '-a', '--add',
     action='store_true',
-    help="add elem")
+    help="add elem to domain")
 
 parser.add_argument(
     '-r', '--remove',
     action='store_true',
-    help="remove elem")
+    help="remove elem from domain")
 
 parser.add_argument(
     '--reset',
@@ -42,12 +42,12 @@ parser.add_argument(
 parser.add_argument(
     '-s', '--select',
     action='store_true',
-    help="select elem")
+    help="select elem from domain")
 
 parser.add_argument(
     '-l', '--list',
     action='store_true',
-    help="add elem")
+    help="list domain elementas")
 
 parser.add_argument(
     '-i', '--index',
@@ -59,7 +59,7 @@ parser.add_argument(
     '-d', '--domain',
     type=str,
     default="",
-    help="elem domain")
+    help="domain, by default it is taken from configuration file")
 
 parser.add_argument(
     '-u', '--user',
@@ -71,7 +71,7 @@ parser.add_argument(
     '-v', '--value',
     type=str,
     default="",
-    help="elem value")
+    help="override value of source action")
 
 args = parser.parse_args()
 
