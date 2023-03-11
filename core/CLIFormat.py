@@ -28,20 +28,13 @@ class CLIFormat:
             fcntl.ioctl(2, termios.TIOCSTI, c)
 
     @staticmethod
-    def format_domain(domain: dict) -> str:
-        msg = ""
+    def format_domain(user: str, domain_id: str, domain: dict, sch) -> str:
+        msg = CLIFormat.colored("user: ",
+                                CLIFormat.WARNING) + CLIFormat.colored(user,
+                                                                       CLIFormat.OKGREEN) + "\n"
+        msg += CLIFormat.colored("domain: ",
+                                 CLIFormat.WARNING) + CLIFormat.colored(domain_id,
+                                                                        CLIFormat.OKGREEN) + "\n"
         for elem in domain["elems"]:
-            if elem["in_use"]:
-                msg += CLIFormat.colored(str(elem["id"]),
-                                         CLIFormat.OKGREEN + CLIFormat.BOLD)
-                msg += ": "
-                if isinstance(elem["value"], str):
-                    msg += elem["value"][:40]
-                else:
-                    for k, v in elem["value"].items():
-                        msg += CLIFormat.colored(k,
-                                                 CLIFormat.WARNING + CLIFormat.BOLD) + ": "
-                        msg += CLIFormat.colored(v + " ", CLIFormat.OKBLUE)
-                    msg = msg[:-2]
-                msg += "\n"
+            msg += sch().to_string(elem["value"]) + "\n"
         return msg

@@ -67,12 +67,6 @@ parser.add_argument(
     default="",
     help="user")
 
-parser.add_argument(
-    '-v', '--value',
-    type=str,
-    default="",
-    help="override value of source action")
-
 args = parser.parse_args()
 
 if __name__ == "__main__":
@@ -83,8 +77,10 @@ if __name__ == "__main__":
     proxy_t_ = REG_NAMESPACE[Type.PROXY][config["proxy"]["type"]]["instance"]
 
     DOMAIN = config["default_domain"] if args.domain == "" else args.domain
-    VALUE = REG_NAMESPACE[Type.SOURCE][config["domains"][DOMAIN]["default_source"]]["instance"].get() \
-        if args.value == "" else args.value
+
+    VALUE, sch = REG_NAMESPACE[Type.SOURCE][config["domains"]
+                                            [DOMAIN]["default_source"]]["instance"]().get()
+
     USER = config["user"] if args.user == "" else args.user
 
     proxy = proxy_t_(config["proxy"])
@@ -118,11 +114,11 @@ if __name__ == "__main__":
 
     if args.list:
         if USER == config["user"]:
-            print(CLIFormat.format_domain(
-                local.get_domain(DOMAIN)))
+            print(CLIFormat.format_domain(USER, DOMAIN,
+                                          local.get_domain(DOMAIN), sch))
         else:
-            print(CLIFormat.format_domain(
-                proxy.get_shared_domain(USER, DOMAIN)))
+            print(CLIFormat.format_domain(USER, DOMAIN,
+                                          proxy.get_shared_domain(USER, DOMAIN), sch))
 
     if args.reset:
         local.reset_domain(DOMAIN)

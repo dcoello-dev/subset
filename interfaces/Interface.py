@@ -1,3 +1,5 @@
+import sys
+
 from schema import Schema, SchemaError
 
 from abc import ABC, abstractmethod
@@ -11,8 +13,9 @@ class Interface(ABC):
         try:
             self._schema.validate(data)
             return True
-        except SchemaError:
-            return False
+        except SchemaError as e:
+            print(str(e) + " on: " + self.__class__.__name__)
+            sys.exit(1)
 
     @abstractmethod
     def to_string(data: dict) -> str:

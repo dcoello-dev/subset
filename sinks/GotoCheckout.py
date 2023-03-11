@@ -4,16 +4,16 @@ from core.Register import Type, Register
 from core.CLIFormat import CLIFormat
 
 from sinks.Sink import Sink
+from interfaces.GitLocation import GitLocation
 
 
 @Register(Type.SINK, "goto_checkout",
           "Go to directory and checkout to branch")
 class GotoCheckout(Sink):
     def __init__(self):
-        pass
+        super().__init__(GitLocation)
 
-    @staticmethod
-    def send(data: dict) -> None:
+    def send_sink(data: dict) -> None:
         CLIFormat.write_on_parent_shell("cd " + data["dir"])
         repo = git.Repo.init(data["dir"])
         cmd = repo.git

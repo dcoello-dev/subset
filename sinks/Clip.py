@@ -3,13 +3,13 @@ import pyperclip
 from core.Register import Type, Register
 
 from sinks.Sink import Sink
+from interfaces.SimpleString import SimpleString
 
 
 @Register(Type.SINK, "clip", "Copy Data on clipboard")
 class Clip(Sink):
     def __init__(self):
-        pass
+        super().__init__(SimpleString)
 
-    @staticmethod
-    def send(data: dict) -> None:
+    def send_sink(data: dict) -> None:
         pyperclip.copy(data["str"])
