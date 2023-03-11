@@ -9,7 +9,7 @@ from interfaces.SimpleString import SimpleString
 @Register(Type.SINK, "clip", "Copy Data on clipboard")
 class Clip(Sink):
     def __init__(self):
-        super().__init__(SimpleString)
+        super().__init__([SimpleString])
 
-    def send_sink(data: dict) -> None:
+    def send_sink(self, data: dict) -> None:
         pyperclip.copy(data["str"])

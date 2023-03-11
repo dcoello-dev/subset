@@ -1,19 +1,16 @@
-import os
-import git
+import pyperclip
 
 from core.Register import Type, Register
+from core.CLIFormat import CLIFormat
 
 from sinks.Sink import Sink
 from interfaces.SimpleString import SimpleString
 
 
-@Register(Type.SINK, "checkout", "Checkout to branch")
-class Checkout(Sink):
+@Register(Type.SINK, "execute_cmd", "Execute bash CMD")
+class ExecuteCMD(Sink):
     def __init__(self):
         super().__init__([SimpleString])
 
     def send_sink(self, data: dict) -> None:
-        repo_dir = os.getcwd()
-        repo = git.Repo.init(repo_dir)
-        cmd = repo.git
-        cmd.checkout(data["str"])
+        CLIFormat.write_on_parent_shell(data["str"])

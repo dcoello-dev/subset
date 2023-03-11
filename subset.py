@@ -110,7 +110,7 @@ if __name__ == "__main__":
     if args.select:
         action, elem = local.select_elem_from_domain(DOMAIN, args.index)
         if elem["in_use"]:
-            REG_NAMESPACE[Type.SINK][action]["instance"].send(elem["value"])
+            REG_NAMESPACE[Type.SINK][action]["instance"]().send(elem["value"])
 
     if args.list:
         if USER == config["user"]:

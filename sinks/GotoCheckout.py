@@ -11,9 +11,9 @@ from interfaces.GitLocation import GitLocation
           "Go to directory and checkout to branch")
 class GotoCheckout(Sink):
     def __init__(self):
-        super().__init__(GitLocation)
+        super().__init__([GitLocation])
 
-    def send_sink(data: dict) -> None:
+    def send_sink(self, data: dict) -> None:
         CLIFormat.write_on_parent_shell("cd " + data["dir"])
         repo = git.Repo.init(data["dir"])
         cmd = repo.git

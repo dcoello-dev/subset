@@ -36,5 +36,8 @@ class CLIFormat:
                                  CLIFormat.WARNING) + CLIFormat.colored(domain_id,
                                                                         CLIFormat.OKGREEN) + "\n"
         for elem in domain["elems"]:
-            msg += sch().to_string(elem["value"]) + "\n"
+            if elem["in_use"]:
+                msg += CLIFormat.colored(str(elem["id"]),
+                                         CLIFormat.OKGREEN) + ": "
+                msg += sch().to_string(elem["value"]) + "\n"
         return msg
