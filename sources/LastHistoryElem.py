@@ -16,5 +16,5 @@ class LastHistoryElem(Source):
     def get_source(self) -> dict:
         with open(os.path.expanduser('~') + "/.bash_history", 'r') as f:
             lines = f.readlines()
-            last_cmd = lines[-2].strip()
+            last_cmd = lines[-1].strip()
             return dict(str=last_cmd)
