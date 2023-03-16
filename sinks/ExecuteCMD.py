@@ -1,5 +1,3 @@
-import pyperclip
-
 from core.Register import Type, Register
 from core.CLIFormat import CLIFormat
 
