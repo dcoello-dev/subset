@@ -11,6 +11,7 @@ import proxys
 
 from core.Register import *
 from core.CLIFormat import CLIFormat
+from core.Controller import Controller
 
 parser = argparse.ArgumentParser()
 
@@ -83,48 +84,34 @@ if __name__ == "__main__":
 
     USER = config["user"] if args.user == "" else args.user
 
-    proxy = proxy_t_(config["proxy"])
-
     if args.generate:
         storage_t_.create_storage(config, config["domains"])
+
         local = storage_t_(config["storage"])
+        proxy = proxy_t_(config["proxy"])
+
         for domain in config["domains"].keys():
             if config["domains"][domain]["shared"]:
                 proxy.update_shared_domain(
-                    USER, domain, local.get_domain(domain))
+                    config["user"], domain, local.get_domain(domain))
 
     local = storage_t_(config["storage"])
+    proxy = proxy_t_(config["proxy"])
+    controller = Controller(config, REG_NAMESPACE, proxy, local)
 
     if args.add:
-        local.add_elem_to_domain(DOMAIN, args.index, VALUE)
-        if config["domains"][DOMAIN]["shared"]:
-            _, elem = local.select_elem_from_domain(DOMAIN, args.index)
-            proxy.update_shared_domain_elem(USER, DOMAIN, args.index, elem)
+        controller.add(DOMAIN, args.index, VALUE)
 
     if args.remove:
-        local.remove_elem_from_domain(DOMAIN, args.index)
-        if config["domains"][DOMAIN]["shared"]:
-            _, elem = local.select_elem_from_domain(DOMAIN, args.index)
-            proxy.update_shared_domain_elem(USER, DOMAIN, args.index, elem)
+        controller.remove(DOMAIN, args.index)
 
     if args.select:
-        action, elem = local.select_elem_from_domain(DOMAIN, args.index)
-        if elem["in_use"]:
-            REG_NAMESPACE[Type.SINK][action]["instance"]().send(elem["value"])
+        controller.select(USER, DOMAIN, args.index)
 
     if args.list:
-        if USER == config["user"]:
-            print(CLIFormat.format_domain(USER, DOMAIN,
-                                          local.get_domain(DOMAIN), sch))
-        else:
-            print(CLIFormat.format_domain(USER, DOMAIN,
-                                          proxy.get_shared_domain(USER, DOMAIN), sch))
+        controller.show(USER, DOMAIN, sch)
 
     if args.reset:
-        local.reset_domain(DOMAIN)
-        if config["domains"][DOMAIN]["shared"]:
-            proxy.update_shared_domain(USER, DOMAIN, local.get_domain(DOMAIN))
+        controller.reset(DOMAIN)
 
-    local.store_changes()
-    time.sleep(0.1)
-    proxy.__del__()
+    controller.__del__()
