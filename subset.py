@@ -76,7 +76,9 @@ parser.add_argument(
 args = parser.parse_args()
 
 if __name__ == "__main__":
-    config = json.loads(open(args.config, "r+").read())
+    file = open(args.config, "r+")
+    config = json.loads(file.read())
+    file.close()
 
     storage_t_ = REG_NAMESPACE[Type.STORAGE][config["storage"]
                                              ["type"]]["instance"]
