@@ -39,6 +39,9 @@ class LocalStorage(Storage):
     def get_domain(self, domain: str) -> dict:
         return self._storage[domain]
 
+    def get_domains(self) -> list:
+        return [k for k in self._storage.keys() if k != "meta"]
+
     def get_list(self, domain: str) -> list:
         return self._storage[domain]["elems"]
 

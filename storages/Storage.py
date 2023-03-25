@@ -19,6 +19,10 @@ class Storage(ABC):
         pass
 
     @abstractmethod
+    def get_domains(self) -> list:
+        pass
+
+    @abstractmethod
     def get_list(self, domain: str) -> list:
         pass
 
