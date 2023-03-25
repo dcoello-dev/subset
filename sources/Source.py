@@ -11,6 +11,9 @@ class Source(ABC):
     def get_source(self) -> dict:
         pass
 
+    def get_schema(self):
+        return self._schema
+
     def get(self) -> dict:
         data = self.get_source()
         self._schema().validate(data)
