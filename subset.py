@@ -12,6 +12,7 @@ import proxys
 from core.Register import *
 from core.KeyLogger import KeyLogger
 from core.Controller import Controller
+from front.TUIFront import TUIFront
 
 parser = argparse.ArgumentParser()
 
@@ -73,6 +74,11 @@ parser.add_argument(
     action='store_true',
     help="keylogger")
 
+parser.add_argument(
+    '--tui',
+    action='store_true',
+    help="tui")
+
 args = parser.parse_args()
 
 if __name__ == "__main__":
@@ -106,6 +112,10 @@ if __name__ == "__main__":
     if args.keylogger:
         key = KeyLogger(config, REG_NAMESPACE, controller)
         key.run()
+
+    if args.tui:
+        tui = TUIFront(config, REG_NAMESPACE, local)
+        tui.run()
 
     VALUE, sch = REG_NAMESPACE[Type.SOURCE][config["domains"]
                                             [DOMAIN]["default_source"]]["instance"]().get()
