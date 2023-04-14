@@ -1,4 +1,5 @@
 import json
+import os
 
 from core.Register import Register, Type
 from storages.Storage import Storage
@@ -8,14 +9,19 @@ from storages.Storage import Storage
 class LocalStorage(Storage):
     def __init__(self, config: dict):
         super().__init__(config)
+        self._update_data()
+
+    def _update_data(self):
         file_ = open(self._config["file"], "r")
         self._storage = json.loads(file_.read())
         file_.close()
+        self.last_updated_ = os.path.getmtime(self._config["file"])
 
     def store_changes(self) -> None:
         file_ = open(self._config["file"], "w+")
         file_.write(json.dumps(self._storage, indent=2))
         file_.close()
+        self.last_updated_ = os.path.getmtime(self._config["file"])
 
     @staticmethod
     def create_storage(config: dict, domains: list) -> None:
@@ -37,12 +43,18 @@ class LocalStorage(Storage):
         file_.write(json.dumps(to_store_, indent=2))
 
     def get_domain(self, domain: str) -> dict:
+        if self.last_updated_ != os.path.getmtime(self._config["file"]):
+            self._update_data()
         return self._storage[domain]
 
     def get_domains(self) -> list:
+        if self.last_updated_ != os.path.getmtime(self._config["file"]):
+            self._update_data()
         return [k for k in self._storage.keys() if k != "meta"]
 
     def get_list(self, domain: str) -> list:
+        if self.last_updated_ != os.path.getmtime(self._config["file"]):
+            self._update_data()
         return self._storage[domain]["elems"]
 
     def reset_domain(self, domain: str):
@@ -52,6 +64,8 @@ class LocalStorage(Storage):
                 elem["in_use"] = False
 
     def add_elem_to_domain(self, domain: str, index: int, value) -> None:
+        if self.last_updated_ != os.path.getmtime(self._config["file"]):
+            self._update_data()
         if domain in self._storage.keys():
             for elem in self._storage[domain]["elems"]:
 
@@ -74,6 +88,8 @@ class LocalStorage(Storage):
                     break
 
     def select_elem_from_domain(self, domain: str, index: int) -> None:
+        if self.last_updated_ != os.path.getmtime(self._config["file"]):
+            self._update_data()
         if domain in self._storage.keys():
             for elem in self._storage[domain]["elems"]:
                 if elem["id"] == index:
