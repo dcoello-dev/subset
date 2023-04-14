@@ -23,6 +23,10 @@ class Storage(ABC):
         pass
 
     @abstractmethod
+    def check_updates(self) -> bool:
+        pass
+
+    @abstractmethod
     def get_list(self, domain: str) -> list:
         pass
 

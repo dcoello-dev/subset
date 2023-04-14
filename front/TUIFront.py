@@ -1,9 +1,31 @@
+import time
+import threading
 import pytermgui as ptg
 
 from pytermgui import Label, Splitter, Button, Collapsible, Container
 
 from core.Register import *
 from core.CLIFormat import CLIFormat
+
+
+class AutoUpdater(threading.Thread):
+    def __init__(self, storage, front):
+        threading.Thread.__init__(self)
+        self._stop = False
+        self._storage = storage
+        self._front = front
+
+    def stop(self):
+        self._stop = True
+
+    def run(self):
+        try:
+            while not self._stop:
+                if self._storage.check_updates():
+                    self._front._update_main()
+                time.sleep(0.1)
+        except Exception:
+            pass
 
 
 class TUIFront:
@@ -20,12 +42,13 @@ class TUIFront:
         self._selected_comains = []
         self._main = Label("", parent_align=0)
 
-    def __callback(self, bt):
-        if bt.label not in self._selected_comains:
-            self._selected_comains.append(bt.label)
-        else:
-            self._selected_comains.remove(bt.label)
+        self._auto_updater = AutoUpdater(self._storage, self)
+        self._auto_updater.start()
 
+    def __del__(self):
+        self._auto_updater.stop()
+
+    def _update_main(self):
         msg = ""
 
         for domain in self._selected_comains:
@@ -48,6 +71,14 @@ class TUIFront:
                             relative_width=0.7))
             msg += "\n"
         self._main.value = msg
+
+    def __callback(self, bt):
+        if bt.label not in self._selected_comains:
+            self._selected_comains.append(bt.label)
+        else:
+            self._selected_comains.remove(bt.label)
+
+        self._update_main()
 
     def _build_header(self) -> Label:
         self._header = Label(self._local_user + " " +
