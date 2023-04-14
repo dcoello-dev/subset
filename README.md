@@ -22,6 +22,9 @@ The main idea is to keep small buffers of elements that you are currently using 
 Easiest way to install it is to clone repo on your `.config` directory and make it your configuration and storage folder.
 
 ```bash
+# install deps
+python3 -m pip install schema GitPython pyperclip pynput paho-mqtt pytermgui
+
 # create .config directoy just in case is not already there
 mkdir -p ~/.config/ && cd ~/.config/
 
