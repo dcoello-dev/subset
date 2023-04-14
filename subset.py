@@ -109,13 +109,16 @@ if __name__ == "__main__":
     proxy = proxy_t_(config["proxy"])
     controller = Controller(config, REG_NAMESPACE, proxy, local)
 
+    if args.tui:
+        tui = TUIFront(config, REG_NAMESPACE, local)
+        if args.keylogger:
+            key = KeyLogger(config, REG_NAMESPACE, controller)
+            key.start()
+        tui.run()
+
     if args.keylogger:
         key = KeyLogger(config, REG_NAMESPACE, controller)
         key.run()
-
-    if args.tui:
-        tui = TUIFront(config, REG_NAMESPACE, local)
-        tui.run()
 
     VALUE, sch = REG_NAMESPACE[Type.SOURCE][config["domains"]
                                             [DOMAIN]["default_source"]]["instance"]().get()
