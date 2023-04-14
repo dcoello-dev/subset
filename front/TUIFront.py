@@ -17,26 +17,42 @@ class TUIFront:
         self._actual_domain = self._conf["default_domain"]
         self._build_header()
 
-        self._main = Container(parent_align=0)
+        self._selected_comains = []
+        self._main = Label("", parent_align=0)
 
     def __callback(self, bt):
-        sch = self._namespace[Type.SOURCE][self._conf["domains"]
-                                           [bt.label]["default_source"]]["instance"]().get_schema()
+        if bt.label not in self._selected_comains:
+            self._selected_comains.append(bt.label)
+        else:
+            self._selected_comains.remove(bt.label)
 
-        buttons = []
-        for elem in self._storage.get_domain(bt.label):
-            print(elem)
-            if elem["in_use"]:
-                msg += CLIFormat.colored(str(elem["id"]),
-                                         CLIFormat.OKGREEN) + ": "
-                msg += sch().to_string(elem["value"])
-                buttons.append(Button(msg), centered=True, relative_width=0.7)
-        self._main =Container(*buttons, parent_align=0)
+        msg = ""
+
+        for domain in self._selected_comains:
+            msg += CLIFormat.colored(domain.upper(),
+                                     CLIFormat.BOLD + CLIFormat.OKBLUE) + "\n"
+            sch = self._namespace[Type.SOURCE][self._conf["domains"]
+                                               [domain]["default_source"]]["instance"]().get_schema()
+
+            buttons = []
+            for elem in self._storage.get_domain(domain)["elems"]:
+                if elem["in_use"]:
+                    msg += CLIFormat.colored(str(elem["id"]),
+                                             CLIFormat.BOLD + CLIFormat.OKGREEN) + "-> "
+                    msg += sch().to_string(elem["value"])
+                    msg += "\n"
+                    buttons.append(
+                        Button(
+                            msg,
+                            centered=True,
+                            relative_width=0.7))
+            msg += "\n"
+        self._main.value = msg
 
     def _build_header(self) -> Label:
-        self._header=  Label(self._local_user + " " +
-                        self._actual_user + " " +
-                        self._actual_domain)
+        self._header = Label(self._local_user + " " +
+                             self._actual_user + " " +
+                             self._actual_domain, parent_align=2)
 
     def _define_layout(self, manager):
         manager.layout.add_slot("header", height=0.1)
@@ -53,26 +69,23 @@ class TUIFront:
             self._define_layout(manager)
 
             manager.add(
-                ptg.Window(
-                    Container(self._header),
-                ), assign="header", animate=False
+                ptg.Window(self._header,
+                           ), assign="header", animate=False
             )
 
             manager.add(
                 ptg.Window(
-                    Container(
-                        self._main, vertical_align=1),
+                    self._main,
                     vertical_align=ptg.VerticalAlignment.TOP
                 ), assign="main", animate=True
             )
 
             lateral_window = ptg.Window(
-                    Container(
-                        Collapsible("DOMAINS", *elems, keyboard=True),
-                        Collapsible("REMOTES", *elems, keyboard=True),
-                        height= 0.9),
-                        vertical_align=ptg.VerticalAlignment.TOP,
-                )
+                Collapsible("DOMAINS", *elems, keyboard=True),
+                Label(""),
+                Collapsible("REMOTES", *elems, keyboard=True),
+                vertical_align=ptg.VerticalAlignment.TOP,
+            )
             manager.add(
                 lateral_window, assign="domains", animate=False
             )
