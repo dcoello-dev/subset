@@ -10,6 +10,37 @@ class LocalStorage(Storage):
     def __init__(self, config: dict):
         super().__init__(config)
         self._update_data()
+        self._policy_dispatcher = dict(
+            BY_INDEX=self._policy_by_index,
+            FIFO=self._policy_fifo)
+
+    def _policy_by_index(self, domain, index, value):
+        if domain in self._storage.keys():
+            for elem in self._storage[domain]["elems"]:
+
+                if index == -1 and not elem["in_use"] and value != "":
+                    elem["value"] = value
+                    elem["in_use"] = True
+                    break
+
+                if elem["id"] == index and value != "":
+                    elem["value"] = value
+                    elem["in_use"] = True
+                    break
+
+    def _policy_fifo(self, domain, _, value):
+        if domain in self._storage.keys():
+            l = len(self._storage[domain]["elems"])
+            for i in range(1, l):
+                self._storage[domain]["elems"][l -
+                                               i]["value"] = self._storage[domain]["elems"][l -
+                                                                                            i -
+                                                                                            1]["value"]
+                if self._storage[domain]["elems"][l - i]["value"] != "":
+                    self._storage[domain]["elems"][l - i]["in_use"] = True
+            self._storage[domain]["elems"][0]["value"] = value
+            if value != "":
+                self._storage[domain]["elems"][0]["in_use"] = True
 
     def _update_data(self):
         file_ = open(self._config["file"], "r")
@@ -69,18 +100,8 @@ class LocalStorage(Storage):
     def add_elem_to_domain(self, domain: str, index: int, value) -> None:
         if self.check_updates():
             self._update_data()
-        if domain in self._storage.keys():
-            for elem in self._storage[domain]["elems"]:
-
-                if index == -1 and not elem["in_use"] and value != "":
-                    elem["value"] = value
-                    elem["in_use"] = True
-                    break
-
-                if elem["id"] == index and value != "":
-                    elem["value"] = value
-                    elem["in_use"] = True
-                    break
+        self._policy_dispatcher[self._storage[domain]["policy"]](
+            domain, index, value)
 
     def remove_elem_from_domain(self, domain: str, index: int) -> None:
         if domain in self._storage.keys():
