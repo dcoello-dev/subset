@@ -1,6 +1,4 @@
 import os
-import sys
-import time
 import json
 import argparse
 
@@ -8,9 +6,9 @@ import sources
 import sinks
 import storages
 import proxys
+import keyloggers
 
 from core.Register import *
-from core.KeyLogger import KeyLogger
 from core.Controller import Controller
 from front.TUIFront import TUIFront
 
@@ -112,12 +110,14 @@ if __name__ == "__main__":
     if args.tui:
         tui = TUIFront(config, REG_NAMESPACE, local)
         if args.keylogger:
-            key = KeyLogger(config, REG_NAMESPACE, controller)
+            key = REG_NAMESPACE[Type.KEYLOGGER][config["default_keylogger"]]["instance"](
+                config, REG_NAMESPACE, controller)
             key.start()
         tui.run()
 
     if args.keylogger:
-        key = KeyLogger(config, REG_NAMESPACE, controller)
+        key = REG_NAMESPACE[Type.KEYLOGGER][config["default_keylogger"]]["instance"](
+            config, REG_NAMESPACE, controller)
         key.run()
 
     VALUE, sch = REG_NAMESPACE[Type.SOURCE][config["domains"]

@@ -6,6 +6,7 @@ class Type:
     SOURCE = "source"
     STORAGE = "storage"
     PROXY = "proxy"
+    KEYLOGGER = "keylogger"
 
 
 REG_NAMESPACE = defaultdict(dict)
