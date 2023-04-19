@@ -2,7 +2,7 @@ import time
 import threading
 import pytermgui as ptg
 
-from pytermgui import Label, Splitter, Button, Collapsible, Container
+from pytermgui import Label, Button, Collapsible
 
 from core.Register import *
 from core.CLIFormat import CLIFormat
@@ -21,9 +21,9 @@ class AutoUpdater(threading.Thread):
     def run(self):
         try:
             while not self._stop:
-                if self._storage.check_updates():
-                    self._front._update_main()
-                time.sleep(0.1)
+                # if self._storage.check_updates():
+                self._front._update_main()
+                time.sleep(0.2)
         except Exception:
             pass
 
