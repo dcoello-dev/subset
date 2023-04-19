@@ -69,6 +69,7 @@ class LocalStorage(Storage):
         for domain, cfg in domains.items():
             to_store_[domain] = {
                 "buffer_size": cfg["buffer_size"],
+                "policy": cfg["policy"],
                 "default_sink": cfg["default_sink"],
                 "default_source": cfg["default_source"],
                 "elems": [{"id": i, "in_use": False, "value": ""} for i in range(0, cfg["buffer_size"])]
@@ -102,6 +103,7 @@ class LocalStorage(Storage):
             self._update_data()
         self._policy_dispatcher[self._storage[domain]["policy"]](
             domain, index, value)
+        self.store_changes()
 
     def remove_elem_from_domain(self, domain: str, index: int) -> None:
         if domain in self._storage.keys():
