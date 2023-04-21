@@ -16,6 +16,15 @@ class SimpleString(Interface):
             msg += " /" + str(len(lines))
         return msg
 
+    def to_tim(self, data: dict) -> str:
+        lines = data["str"].split("\n")
+        msg = lines[0][:40]
+        if len(lines[0]) > 40:
+            msg += " [bold fuchsia]/" + str(len(lines[0])) + "[/]"
+        if len(lines) > 1:
+            msg += " [bold orangered]/" + str(len(lines)) + "[/]"
+        return msg
+
     def serialize(self, data: dict) -> str:
         pass
 

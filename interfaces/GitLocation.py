@@ -1,3 +1,5 @@
+import pytermgui
+
 from interfaces.Interface import Interface
 
 from core.CLIFormat import *
@@ -20,6 +22,11 @@ class GitLocation(Interface):
                                  CLIFormat.WARNING + CLIFormat.BOLD) + ": "
         msg += CLIFormat.colored(data["branch"] + " ", CLIFormat.OKBLUE)
         return msg
+
+    def to_tim(self, data: dict) -> str:
+        return "[magenta]" + \
+            data["dir"].split("/")[-1] + "[cyan]@[lime]" + \
+            data["branch"] + "[/]"
 
     def serialize(self, data: dict) -> str:
         pass
