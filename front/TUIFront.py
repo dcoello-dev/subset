@@ -1,6 +1,7 @@
 import time
 import threading
 import pytermgui as ptg
+from core.Observer import Observer, Subject
 
 from pytermgui import Label, Button, Collapsible, palette
 
@@ -27,7 +28,7 @@ class AutoUpdater(threading.Thread):
             pass
 
 
-class TUIFront:
+class TUIFront(Observer):
     def __init__(self, conf, namespace, storage):
         self._conf = conf
         self._namespace = namespace
@@ -47,6 +48,12 @@ class TUIFront:
 
     def __del__(self):
         self._auto_updater.stop()
+
+    def update(self, subject: Subject, event: dict) -> None:
+        """
+        Receive update from subject.
+        """
+        print(event)
 
     def _update_main(self):
         msg = ""

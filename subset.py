@@ -109,6 +109,7 @@ if __name__ == "__main__":
 
     if args.tui:
         tui = TUIFront(config, REG_NAMESPACE, local)
+        controller.attach(tui)
         if args.keylogger:
             key = REG_NAMESPACE[Type.KEYLOGGER][config["default_keylogger"]]["instance"](
                 config, REG_NAMESPACE, controller)
